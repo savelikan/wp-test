@@ -30,6 +30,14 @@ class Admin {
 		$this->fileManager = $fileManager;
         $this->updateParams();
 
+        // додати ссилки у меню
+        $this->addToMenu();
+
+        add_action( 'admin_init', [$this, 'premmerce_settings_init'] );
+	}
+
+
+	public function addToMenu(){
         //--створити силку в головному меню
         add_action( 'admin_menu', function (){
             add_menu_page(
@@ -64,17 +72,7 @@ class Admin {
                 [$this, 'optionsPage']
             );
         } );
-
-
-        // Зареєструвати, локалізувати та підключити скрипт адмінки
-        //$this->registerScript();
-        //$this->registerStyle();
-
-        add_action( 'admin_enqueue_scripts', [$this, 'registerScript'] );
-        add_action( 'admin_enqueue_scripts', [$this, 'registerStyle'] );
-
-        add_action( 'admin_init', [$this, 'premmerce_settings_init'] );
-	}
+    }
 
 
     // Зареєструвати, локалізувати та підключити скрипт
@@ -128,6 +126,9 @@ class Admin {
         if (!current_user_can('manage_options')) {
             return;
         }
+
+        $this->registerScript();
+        $this->registerStyle();
 
         // Зберігаємо або оновлюємо дані
         if(isset($_POST) and isset($_POST['submit'])) {

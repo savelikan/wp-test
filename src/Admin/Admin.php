@@ -67,7 +67,11 @@ class Admin {
 
 
         // Зареєструвати, локалізувати та підключити скрипт адмінки
-        $this->registerScript();
+        //$this->registerScript();
+        //$this->registerStyle();
+
+        add_action( 'admin_enqueue_scripts', [$this, 'registerScript'] );
+        add_action( 'admin_enqueue_scripts', [$this, 'registerStyle'] );
 
         add_action( 'admin_init', [$this, 'premmerce_settings_init'] );
 	}
@@ -84,6 +88,15 @@ class Admin {
         );
         wp_localize_script( 'my_script', 'object_name', $translation_array );
         wp_enqueue_script( 'my_script' );
+    }
+
+
+    // Зареєструвати та підключити стилі
+    public function registerStyle() {
+        wp_register_style(
+            'my_css',
+            '/wp-content/plugins/'.$this->fileManager->getPluginName().'/assets/admin/style.css' );
+        wp_enqueue_style( 'my_css' );
     }
 
 

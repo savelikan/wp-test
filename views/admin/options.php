@@ -30,6 +30,7 @@
         <?php submit_button('Зберегти налаштування' ); ?>
     </form>
 </div>
+<div class="mystyle">CSS</div>
 
 <script>
     console.log( object_name ); // 10

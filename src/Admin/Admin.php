@@ -65,12 +65,29 @@ class Admin {
             );
         } );
 
-        /**
-         * Реєстрація premmerce_settings_init по хуку admin_init
-         */
-        add_action( 'init', [$this, 'register_new_post_type'] );
+
+        // Зареєструвати, локалізувати та підключити скрипт адмінки
+        $this->registerScript();
+
         add_action( 'admin_init', [$this, 'premmerce_settings_init'] );
 	}
+
+
+    // Зареєструвати, локалізувати та підключити скрипт
+	public function registerScript(){
+        wp_register_script(
+            'my_script',
+            '/wp-content/plugins/'.$this->fileManager->getPluginName().'/assets/admin/sctipt.js' );
+        $translation_array = array(
+            'text' => __( 'Some string to translate', 'premmerce-testing-plugin' ),
+            'number' => 10
+        );
+        wp_localize_script( 'my_script', 'object_name', $translation_array );
+        wp_enqueue_script( 'my_script' );
+    }
+
+
+
 
 
 
@@ -87,30 +104,6 @@ class Admin {
         );
     }
 
-
-
-    // Реєстрація нового типу
-    function register_new_post_type() {
-        register_post_type('premmerce_my_post',
-            [
-                'labels'              => [
-                    'name'          => __('My post type', 'premmerce-testing-plugin'),
-                    'singular_name' => __('My post types', 'premmerce-testing-plugin'),
-                ],
-                'public'              => true,
-                'has_archive'         => true,
-                'show_ui'             => true,
-                'show_in_menu'        => true,
-                'menu_position'       => 5,
-                'menu_icon'           => 'dashicons-admin-page',
-                'show_in_admin_bar'   => true,
-                'show_in_nav_menus'   => true,
-                'can_export'          => true,
-                'exclude_from_search' => false,
-                'publicly_queryable'  => true,
-            ]
-        );
-    }
 
 
 

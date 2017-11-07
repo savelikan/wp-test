@@ -84,8 +84,8 @@ class Admin {
             'text' => __( 'Some string to translate', 'premmerce-testing-plugin' ),
             'number' => 10
         );
-        wp_localize_script( 'my_script', 'object_name', $translation_array );
         wp_enqueue_script( 'my_script' );
+        wp_localize_script( 'my_script', 'object_name', $translation_array );
     }
 
 

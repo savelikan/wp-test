@@ -32,6 +32,3 @@
 </div>
 <div class="mystyle">CSS</div>
 
-<script>
-    console.log( object_name ); // 10
-</script>

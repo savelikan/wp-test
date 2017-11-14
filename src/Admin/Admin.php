@@ -74,6 +74,17 @@ class Admin {
         } );
     }
 
+    function adding_custom_meta_boxes( $post_type, $post ) {
+        add_meta_box(
+            'my-meta-box',
+            __( 'My Meta Box' ),
+            'render_custom_box_html',
+            'post',
+            'normal',
+            'default'
+        );
+    }
+
 
     // Зареєструвати, локалізувати та підключити скрипт
 	public function registerScript(){

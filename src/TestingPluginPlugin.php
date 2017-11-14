@@ -24,10 +24,12 @@ class TestingPluginPlugin {
 
 		$this->fileManager = $fileManager;
 
-        add_action('init', [ $this, 'loadTextDomain' ]);
+        add_action( 'init', [ $this, 'loadTextDomain' ]);
         add_action( 'init', [$this, 'register_new_post_type'] );
         add_action( 'init', [$this, 'register_new_texomony'] );
 
+        add_action( 'add_meta_boxes', [$this, 'adding_post_type_metabox'] );
+        add_action( 'save_post', [$this, 'adding_post_type_metabox_save']);
 	}
 
 	/**
@@ -78,7 +80,7 @@ class TestingPluginPlugin {
 
 
     // Реєстрація нового типу
-    function register_new_post_type() {
+    public function register_new_post_type() {
         register_post_type('premmerce_my_post',
             [
                 'labels'              => [
@@ -99,6 +101,47 @@ class TestingPluginPlugin {
             ]
         );
     }
+
+    // додати метабокс до поста
+    public function adding_post_type_metabox( $post ) {
+        add_meta_box(
+            'id-meta-box',
+            __( 'My Personal Meta Box' ),
+            [$this, 'render_post_type_metabox'],
+            'premmerce_my_post',
+            'side',
+            'default'
+        );
+    }
+
+    // вигляд метабоксу
+    public function render_post_type_metabox ($post,$add)
+    {
+        $meta_values = get_post_meta( $post->ID, $add['id'], true );
+        ?>
+        <label for="id-meta-box">Description for this field</label>
+        <select name="id-meta-box" id="id-meta-box" class="postbox">
+            <option <?php selected($meta_values, '' ); ?> value="">Select something...</option>
+            <option <?php selected($meta_values, 'something' ); ?> value="something">Something</option>
+            <option <?php selected($meta_values, 'else' ); ?> value="else">Else</option>
+        </select>
+        <?php
+    }
+
+    public function adding_post_type_metabox_save( $post_id ){
+        if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE )
+            return $post_id;
+        if ( ! current_user_can( 'edit_page', $post_id ) )
+            return $post_id;
+        if (array_key_exists('id-meta-box', $_POST)) {
+            update_post_meta(
+                $post_id,
+                'id-meta-box',
+                $_POST['id-meta-box']
+            );
+        }
+    }
+
 
 
 

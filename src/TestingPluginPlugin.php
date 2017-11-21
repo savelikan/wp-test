@@ -10,16 +10,11 @@ use TestingPlugin\Frontend\Frontend;
  */
 class TestingPluginPlugin {
 
-	/**
-	 * @var FileManager
-	 */
-	private $fileManager;
+    private $fileManager;
 
-	/**
-	 * PluginManager constructor.
-	 *
-	 * @param FileManager $fileManager
-	 */
+    public $pluginName = 'premmerce-testing-plugin';
+
+
 	public function __construct( FileManager $fileManager ) {
 
 		$this->fileManager = $fileManager;
@@ -37,9 +32,9 @@ class TestingPluginPlugin {
 	 */
 	public function run() {
 		if ( is_admin() ) {
-			new Admin( $this->fileManager );
+			new Admin( $this->fileManager);
 		} else {
-			new Frontend( $this->fileManager );
+			new Frontend( $this->fileManager);
 		}
 
 	}
@@ -50,7 +45,7 @@ class TestingPluginPlugin {
     public function loadTextDomain()
     {
         $name = $this->fileManager->getPluginName();
-        load_plugin_textdomain('premmerce-testing-plugin', false, $name . '/languages/');
+        load_plugin_textdomain($this->pluginName, false, $name . '/languages/');
     }
 
 
@@ -84,8 +79,8 @@ class TestingPluginPlugin {
         register_post_type('premmerce_my_post',
             [
                 'labels'              => [
-                    'name'          => __('My post type', 'premmerce-testing-plugin'),
-                    'singular_name' => __('My post types', 'premmerce-testing-plugin'),
+                    'name'          => __('My post type', $this->pluginName),
+                    'singular_name' => __('My post types', $this->pluginName),
                 ],
                 'public'              => true,
                 'has_archive'         => true,

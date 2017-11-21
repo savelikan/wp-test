@@ -9,25 +9,20 @@ use TestingPlugin\FileManager;
  */
 class Admin {
 
-	/**
-	 * @var FileManager
-	 */
+    public $pluginName;
+
 	private $fileManager;
 
-    /**
-     * Тут збережемо всі налаштування
-     */
     private $params;
 
-	/**
-	 * Admin constructor.
-	 *
-	 * Register menu items and handlers
-	 *
-	 * @param FileManager $fileManager
-	 */
-	public function __construct( FileManager $fileManager ) {
+    /**
+     * Admin constructor.
+     * @param FileManager $fileManager
+     * @param $pluginName
+     */
+	public function __construct( FileManager $fileManager) {
 		$this->fileManager = $fileManager;
+        $this->pluginName = $this->fileManager->getPluginName();
         $this->updateParams();
 
         // додати ссилки у меню
@@ -37,12 +32,15 @@ class Admin {
 	}
 
 
+    /**
+     * Створити посилання на плагін у меню адмінки
+     */
 	public function addToMenu(){
         //--створити силку в головному меню
         add_action( 'admin_menu', function (){
             add_menu_page(
-                __('Main page of testing module', 'premmerce-testing-plugin'),
-                __('Testing module', 'premmerce-testing-plugin'),
+                __('Main page of testing module', $this->pluginName),
+                __('Testing module', $this->pluginName),
                 'manage_options',
                 'premmerce-index',
                 function(){}
@@ -53,8 +51,8 @@ class Admin {
         add_action( 'admin_menu', function (){
             add_submenu_page(
                 'premmerce-index',
-                __('Settings SETTINGS', 'premmerce-testing-plugin'),
-                __('Settings SETTINGS', 'premmerce-testing-plugin'),
+                __('Settings SETTINGS', $this->pluginName),
+                __('Settings SETTINGS', $this->pluginName),
                 'manage_options',
                 'premmerce-settings',
                 [$this, 'settingsPage']
@@ -65,8 +63,8 @@ class Admin {
         add_action( 'admin_menu', function (){
             add_submenu_page(
                 'premmerce-index',
-                __('Settings OPTIONS', 'premmerce-testing-plugin'),
-                __('Settings OPTIONS', 'premmerce-testing-plugin'),
+                __('Settings OPTIONS', $this->pluginName),
+                __('Settings OPTIONS', $this->pluginName),
                 'manage_options',
                 'premmerce-options',
                 [$this, 'optionsPage']
@@ -74,10 +72,15 @@ class Admin {
         } );
     }
 
+    /**
+     * Створити кастомний мета-бокс
+     * @param $post_type
+     * @param $post
+     */
     function adding_custom_meta_boxes( $post_type, $post ) {
         add_meta_box(
             'my-meta-box',
-            __( 'My Meta Box' ),
+            __( 'My Meta Box', $this->pluginName),
             'render_custom_box_html',
             'post',
             'normal',
@@ -86,13 +89,15 @@ class Admin {
     }
 
 
-    // Зареєструвати, локалізувати та підключити скрипт
+    /**
+     * Зареєструвати, локалізувати та підключити скрипт
+     */
 	public function registerScript(){
         wp_register_script(
             'my_script',
             '/wp-content/plugins/'.$this->fileManager->getPluginName().'/assets/admin/sctipt.js' );
         $translation_array = array(
-            'text' => __( 'Some string to translate', 'premmerce-testing-plugin' ),
+            'text' => __( 'Some string to translate', $this->pluginName),
             'number' => 10
         );
         wp_enqueue_script( 'my_script' );
@@ -100,7 +105,9 @@ class Admin {
     }
 
 
-    // Зареєструвати та підключити стилі
+    /**
+     * Зареєструвати та підключити стилі
+     */
     public function registerStyle() {
         wp_register_style(
             'my_css',
@@ -109,10 +116,9 @@ class Admin {
     }
 
 
-
-
-
-
+    /**
+     * Оновити налаштування та заповнити пусті значення стандартними
+     */
 	public function updateParams(){
         // Отримати налаштування та заповнити пусті значення стандатрними
         $this->params = array(
@@ -127,10 +133,9 @@ class Admin {
     }
 
 
-
-
-
-    //--показати сторінку налаштування OPTIONS
+    /**
+     * Сторінка налаштувань ОПЦІЇ
+     */
     function optionsPage()
     {
         // Перевірка прав доступу
@@ -153,15 +158,19 @@ class Admin {
             $this->updateParams();
         }
 
-        $this->fileManager->includeTemplate('admin/options.php', ['options'=>$this->params]);
+        $this->fileManager->includeTemplate(
+                'admin/options.php',
+                [
+                        'options'=>$this->params
+                ]
+        );
 
     }
 
 
-
-
-
-
+    /**
+     * Сторінка налаштувань SETTINGS
+     */
 	public function settingsPage(){
         // Перевірка прав доступу
         if ( ! current_user_can( 'manage_options' ) ) {
@@ -172,7 +181,7 @@ class Admin {
             add_settings_error(
                 'premmerce_messages',
                 'premmerce_message',
-                __('Saved', 'premmerce-testing-plugin'),
+                __('Saved', $this->pluginName),
                 'updated' );
         }
 
@@ -191,7 +200,7 @@ class Admin {
                 do_settings_sections( 'premmerce' );
 
                 // Кнопка збереження
-                submit_button( __('Save settings', 'premmerce-testing-plugin') );
+                submit_button( __('Save settings', $this->pluginName) );
                 ?>
             </form>
         </div>
@@ -207,7 +216,7 @@ class Admin {
         // Зареєструвати секцію на сторінці "premmerce"
         add_settings_section(
             'premmerce_section',
-            __('Section', 'premmerce-testing-plugin'),
+            __('Section', $this->pluginName),
             [$this, 'premmerce_section_callback'],
             'premmerce'
         );
@@ -215,7 +224,7 @@ class Admin {
         // Зареєструвати поле в секції "premmerce_section"
         add_settings_field(
             'premmerce_field_input',
-            __('Text', 'premmerce-testing-plugin'),
+            __('Text', $this->pluginName),
             [$this, 'premmerce_input_callback'],
             'premmerce',
             'premmerce_section',
@@ -227,7 +236,7 @@ class Admin {
         // Зареєструвати поле в секції "premmerce_section"
         add_settings_field(
             'premmerce_field_checkbox',
-            __('Checkbox', 'premmerce-testing-plugin'),
+            __('Checkbox', $this->pluginName),
             [$this, 'premmerce_checkbox_callback'],
             'premmerce',
             'premmerce_section',
@@ -239,7 +248,7 @@ class Admin {
         // Зареєструвати поле в секції "premmerce_section"
         add_settings_field(
             'premmerce_field_select',
-            __('Select', 'premmerce-testing-plugin'),
+            __('Select', $this->pluginName),
             [$this, 'premmerce_select_callback'],
             'premmerce',
             'premmerce_section',
@@ -251,7 +260,7 @@ class Admin {
 
 
     public function premmerce_section_callback() {
-        echo "<p>"._e("Content of section", 'premmerce-testing-plugin')."</p>";
+        echo "<p>"._e("Content of section", $this->pluginName)."</p>";
     }
 
     public function premmerce_input_callback( $args ) {
@@ -275,9 +284,9 @@ class Admin {
     public function premmerce_select_callback( $args ) {
         ?>
         <select name="premmerce_options[<?= esc_attr( $args['label_for'] ); ?>]">
-            <option value="1" <?php selected( $this->params[ $args['label_for'] ], 1 ); ?>><?=__('Variant 1', 'premmerce-testing-plugin')?></option>
-            <option value="2" <?php selected( $this->params[ $args['label_for'] ], 2 ); ?>><?=__('Variant 2', 'premmerce-testing-plugin')?></option>
-            <option value="3" <?php selected( $this->params[ $args['label_for'] ], 3 ); ?>><?=__('Variant 3', 'premmerce-testing-plugin')?></option>
+            <option value="1" <?php selected( $this->params[ $args['label_for'] ], 1 ); ?>><?=__('Variant 1', $this->pluginName)?></option>
+            <option value="2" <?php selected( $this->params[ $args['label_for'] ], 2 ); ?>><?=__('Variant 2', $this->pluginName)?></option>
+            <option value="3" <?php selected( $this->params[ $args['label_for'] ], 3 ); ?>><?=__('Variant 3', $this->pluginName)?></option>
         </select>
         <?php
     }

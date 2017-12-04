@@ -61,6 +61,13 @@ class TestingPluginPlugin {
             ], $atts);
             return '<pre class="'.$atts['class'].'">'.$content.'</pre>';
         });
+        // Подвійний з контентом і атрибутом з вкладеним шорткодом
+        add_shortcode('pre', function($atts, $content){
+            $atts = shortcode_atts([
+                'class' => 'default'
+            ], $atts);
+            return '<pre class="'.$atts['class'].'">'.do_shortcode($content).'</pre>';
+        });
     }
 
     /**

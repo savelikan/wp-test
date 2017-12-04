@@ -16,7 +16,6 @@ class TestingPluginPlugin {
 
 
 	public function __construct( FileManager $fileManager ) {
-
 		$this->fileManager = $fileManager;
 
         add_action( 'init', [ $this, 'loadTextDomain' ]);
@@ -25,6 +24,9 @@ class TestingPluginPlugin {
 
         add_action( 'add_meta_boxes', [$this, 'adding_post_type_metabox'] );
         add_action( 'save_post', [$this, 'adding_post_type_metabox_save']);
+
+
+        add_action( 'init', [$this, 'premmerce_init_shortcodes' ]);
 	}
 
 	/**
@@ -38,6 +40,28 @@ class TestingPluginPlugin {
 		}
 
 	}
+
+
+    /**
+     * shortcodes
+     */
+    public function premmerce_init_shortcodes() {
+        // Одинарний атрибут
+        add_shortcode('image', function($atts){
+            $atts = shortcode_atts([
+                'src' => '/images/no_image.png',
+                'data' => null
+            ], $atts);
+            return "<img data-atribute='{$atts['data']}' src='{$atts['src']}'>";
+        });
+        // Подвійний з контентом і атрибутом
+        add_shortcode('pre', function($atts, $content){
+            $atts = shortcode_atts([
+                'class' => 'default'
+            ], $atts);
+            return '<pre class="'.$atts['class'].'">'.$content.'</pre>';
+        });
+    }
 
     /**
      * Load plugin translations
@@ -91,7 +115,7 @@ class TestingPluginPlugin {
                 'show_in_admin_bar'   => true,
                 'show_in_nav_menus'   => true,
                 'can_export'          => true,
-                'exclude_from_search' => false,
+                'exclude_from_search' => true,
                 'publicly_queryable'  => true,
             ]
         );

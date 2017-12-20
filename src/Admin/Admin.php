@@ -128,7 +128,7 @@ class Admin {
         );
         $this->params = array_merge(
             $this->params,
-            get_option('premmerce_options')
+            (array)get_option('premmerce_options')
         );
     }
 

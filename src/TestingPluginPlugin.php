@@ -27,6 +27,11 @@ class TestingPluginPlugin {
 
 
         add_action( 'init', [$this, 'premmerce_init_shortcodes' ]);
+		
+		
+		add_action( 'widgets_init', function() {
+			register_widget('TestingPlugin\TestingWidget');
+		});
 	}
 
 	/**

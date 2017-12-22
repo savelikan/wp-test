@@ -70,6 +70,18 @@ class Admin {
                 [$this, 'optionsPage']
             );
         } );
+
+        //--створити підменю для витягування даних з поста
+        add_action( 'admin_menu', function (){
+            add_submenu_page(
+                'premmerce-index',
+                __('WP query', $this->pluginName),
+                __('WP query', $this->pluginName),
+                'manage_options',
+                'premmerce-wp-query',
+                [$this, 'wp_query']
+            );
+        } );
     }
 
     /**
@@ -133,10 +145,21 @@ class Admin {
     }
 
 
+
+    public function wp_query(){
+        $query = new \WP_Query( array( 'post_type' => 'premmerce_my_post' ) );
+        while ( $query->have_posts() ) {
+            $query->the_post();
+            echo '<p>Назва поста: '.get_the_title().'</p>';
+            echo '<p>Опис поста: '.get_the_content().'</p>';
+        }
+    }
+
+
     /**
      * Сторінка налаштувань ОПЦІЇ
      */
-    function optionsPage()
+    public function optionsPage()
     {
         // Перевірка прав доступу
         if (!current_user_can('manage_options')) {
